@@ -1,0 +1,23 @@
+{
+    "appKeys": {},
+    "capabilities": [
+        ""
+    ],
+    "companyName": "hexaguin@gmail.com",
+    "enableMultiJS": false,
+    "longName": "KeePebble",
+    "projectType": "native",
+    "resources": {
+        "media": []
+    },
+    "sdkVersion": "3",
+    "shortName": "KeePebble",
+    "targetPlatforms": [
+        "basalt"
+    ],
+    "uuid": "0d1db88b-d34d-434c-bcab-1b12bc88e36d",
+    "versionLabel": "1.0",
+    "watchapp": {
+        "watchface": false
+    }
+}
