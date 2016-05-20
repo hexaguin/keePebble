@@ -104,9 +104,7 @@ uint16_t get_num_rows_callback(MenuLayer *me, uint16_t section_index, void *data
 }
 
 static void draw_row_callback(GContext *ctx, const Layer *cell_layer, MenuIndex *cell_index, void *context) {
-  char str[16]; //HACK should expand max note size
-  snprintf(str, 16, "Note %d", cell_index->row);
-  menu_cell_basic_draw(ctx, cell_layer, str, NULL, NULL);
+  menu_cell_basic_draw(ctx, cell_layer, items[cell_index->row], NULL, NULL);
 }
 
 static int16_t get_cell_height_callback(struct MenuLayer *menu_layer, MenuIndex *cell_index, void *context) {
