@@ -13,9 +13,7 @@
     "sdkVersion": "3",
     "shortName": "KeePebble",
     "targetPlatforms": [
-        "aplite",
-        "basalt",
-        "chalk"
+        "basalt"
     ],
     "uuid": "0d1db88b-d34d-434c-bcab-1b12bc88e36d",
     "versionLabel": "1.0",

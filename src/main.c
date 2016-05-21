@@ -121,6 +121,8 @@ static void main_window_load(Window *window) {
   
   Layer *window_layer = window_get_root_layer(window);
   s_statusbar_layer = status_bar_layer_create();
+  status_bar_layer_set_colors(s_statusbar_layer, COLOR_HIGHLIGHT, COLOR_FOREGROUND);
+  status_bar_layer_set_separator_mode(s_statusbar_layer, StatusBarLayerSeparatorModeDotted);
   
   GRect bounds = layer_get_bounds(window_layer);
   bounds.origin.y+=STATUS_BAR_LAYER_HEIGHT; //resize "usable" area to not overlap with statusbar
@@ -135,8 +137,8 @@ static void main_window_load(Window *window) {
   s_menu_layer = menu_layer_create(bounds);
   menu_layer_set_click_config_onto_window(s_menu_layer, window);
 #if defined(PBL_COLOR)
-  menu_layer_set_normal_colors(s_menu_layer, GColorWhite, GColorBlack);
-  menu_layer_set_highlight_colors(s_menu_layer, GColorChromeYellow, GColorBlack);
+  menu_layer_set_normal_colors(s_menu_layer, COLOR_BACKGROUND, COLOR_FOREGROUND);
+  menu_layer_set_highlight_colors(s_menu_layer, COLOR_HIGHLIGHT, COLOR_FOREGROUND);
 #endif
   
   layer_add_child(window_layer, (Layer*) s_loading_layer);
