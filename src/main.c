@@ -7,6 +7,7 @@ bool displayingNote = false;
 static Window *s_main_window;
 MenuLayer *s_menu_layer;
 TextLayer *s_loading_layer;
+StatusBarLayer *s_statusbar_layer;
 
 char items[50][20]; //Array of note items
 uint8_t numOfItems = 0;
@@ -67,7 +68,7 @@ void list_part_received(DictionaryIterator *received){ //TODO figure out how thi
 		app_comm_set_sniff_interval(SNIFF_INTERVAL_REDUCED);
 		app_comm_set_sniff_interval(SNIFF_INTERVAL_NORMAL);
 	}
-
+  
 	layer_set_hidden((Layer*) s_loading_layer, true);
 	layer_set_hidden((Layer*) s_menu_layer, false);
 
@@ -119,7 +120,11 @@ static void select_callback(struct MenuLayer *menu_layer, MenuIndex *cell_index,
 static void main_window_load(Window *window) {
   
   Layer *window_layer = window_get_root_layer(window);
+  s_statusbar_layer = status_bar_layer_create();
+  
   GRect bounds = layer_get_bounds(window_layer);
+  bounds.origin.y+=STATUS_BAR_LAYER_HEIGHT; //resize "usable" area to not overlap with statusbar
+  bounds.size.h-=STATUS_BAR_LAYER_HEIGHT;
   
   GRect loadingBounds = GRect(0, 84, 144, 84 - 16);
   s_loading_layer = text_layer_create(loadingBounds);
@@ -142,13 +147,14 @@ static void main_window_load(Window *window) {
       .select_click = select_callback,
   });
   layer_add_child(window_layer, menu_layer_get_layer(s_menu_layer));
+  layer_add_child(window_layer, status_bar_layer_get_layer(s_statusbar_layer));
   
   layer_set_hidden((Layer*) s_loading_layer, false);
 	layer_set_hidden((Layer*) s_menu_layer, true);
 }
 
 static void main_window_unload(Window *window) {
-
+  
 }
 
 static void init() {

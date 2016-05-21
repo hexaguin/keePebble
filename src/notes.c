@@ -49,7 +49,7 @@ void note_init() {
 	Layer* topLayer = window_get_root_layer(fullWindow);
   GRect windowBounds = layer_get_bounds(topLayer);
   
-  window_set_window_handlers(fullWindow, (WindowHandlers) { //Add handlers
+  window_set_window_handlers(fullWindow, (WindowHandlers) {
     .load = note_window_load,
     .unload = note_window_unload
   });
