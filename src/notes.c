@@ -7,8 +7,7 @@ TextLayer* fullNoteText;
 ScrollLayer* scroller;
 Window* fullWindow;
 
-void note_data_received(DictionaryIterator* iterator)
-{
+void note_data_received(DictionaryIterator* iterator) {
 	uint16_t location = dict_find(iterator, 1)->value->uint16;
 	uint16_t segmentLength = dict_find(iterator, 2)->value->uint16;
 
@@ -23,8 +22,7 @@ void note_data_received(DictionaryIterator* iterator)
 
 	text_layer_set_text(fullNoteText, fullNote);
 
-	if (segmentLength == 75)
-	{
+	if (segmentLength == 75) {
 		DictionaryIterator *iterator;
 		app_message_outbox_begin(&iterator);
 
@@ -46,10 +44,7 @@ static void note_window_unload(Window *window) {
   displayingNote = false;
 }
 
-void note_init()
-{ 
-  
-  
+void note_init() { 
 	fullWindow = window_create();
 	Layer* topLayer = window_get_root_layer(fullWindow);
   GRect windowBounds = layer_get_bounds(topLayer);

@@ -35,29 +35,23 @@ void list_part_received(DictionaryIterator *received){ //TODO figure out how thi
 
 	bool listFinished = false;
 
-	for (uint8_t i = 0; i < 3; i++)
-	{
+	for (uint8_t i = 0; i < 3; i++) {
 		uint8_t listPos = index + i;
-		if (listPos > numOfItems - 1)
-		{
+    
+		if (listPos > numOfItems - 1) {
 			listFinished = true;
 			break;
 		}
-
 		strcpy(items[listPos], dict_find(received, i + 3)->value->cstring);
 	}
 
-	if (index + 3 == numOfItems)
-		listFinished = true;
+	if (index + 3 == numOfItems) listFinished = true;
 
-	if (listFinished)
-	{
+	if (listFinished)	{
 		loading = false;
 	}
-	else
-	{
-		if (pickedItem != -1)
-		{
+	else {
+		if (pickedItem != -1)	{
 			sendSelection();
 			return;
 		}
@@ -81,24 +75,22 @@ void list_part_received(DictionaryIterator *received){ //TODO figure out how thi
 }
 
 void received_data(DictionaryIterator *received, void *context) {
-	if (displayingNote)
-	{
+	if (displayingNote)	{
 		note_data_received(received);
 		return;
 	}
 
 	uint8_t id = dict_find(received, 0)->value->uint8;
 
-	switch (id)
-	{
-	case 0:
-		list_part_received(received);
-		break;
-	case 1:
-		displayingNote = true;
-		note_init();
-		note_data_received(received);
-		break;
+	switch (id)	{
+  	case 0:
+  		list_part_received(received);
+  		break;
+  	case 1:
+  		displayingNote = true;
+  		note_init();
+  		note_data_received(received);
+  		break;
 	}
 }
 
