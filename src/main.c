@@ -1,5 +1,8 @@
 #include <pebble.h>
 #include "notes.h"
+#include "globals.h"
+
+bool displayingNote = false;
 
 static Window *s_main_window;
 MenuLayer *s_menu_layer;
@@ -11,7 +14,7 @@ uint8_t numOfItems = 0;
 bool loading = true;
 int8_t pickedItem = -1;
 
-bool displayingNote = false;
+extern bool displayingNote;
 
 void sendSelection(){
 	DictionaryIterator *iterator;
@@ -115,7 +118,10 @@ static int16_t get_cell_height_callback(struct MenuLayer *menu_layer, MenuIndex 
 }
 
 static void select_callback(struct MenuLayer *menu_layer, MenuIndex *cell_index, void *context) {
-  //TODO things
+  pickedItem = cell_index->row;
+
+	if (!loading)
+		sendSelection();
 }
 
 static void main_window_load(Window *window) {

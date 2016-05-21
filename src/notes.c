@@ -1,5 +1,6 @@
 #include "pebble.h"
 #include "pebble_fonts.h"
+#include "globals.h"
 
 char fullNote[3000];
 TextLayer* fullNoteText;
@@ -38,12 +39,24 @@ void note_data_received(DictionaryIterator* iterator)
 
 }
 
+static void note_window_load(Window *window) {
+  //Should be populated
+}
+
+static void note_window_unload(Window *window) {
+  displayingNote = false;
+}
+
 void note_init()
 {
 	GRect windowBounds = GRect(0, 0, 144, 168 - 16);
 
 	fullWindow = window_create();
 	Layer* topLayer = window_get_root_layer(fullWindow);
+  window_set_window_handlers(fullWindow, (WindowHandlers) { //Add handlers
+    .load = note_window_load,
+    .unload = note_window_unload
+  });
 
 	fullNoteText = text_layer_create(windowBounds);
 	text_layer_set_font(fullNoteText, fonts_get_system_font(FONT_KEY_GOTHIC_18));
