@@ -36,7 +36,6 @@ void note_data_received(DictionaryIterator* iterator)
 		app_comm_set_sniff_interval(SNIFF_INTERVAL_REDUCED);
 		app_comm_set_sniff_interval(SNIFF_INTERVAL_NORMAL);
 	}
-
 }
 
 static void note_window_load(Window *window) {
@@ -48,11 +47,13 @@ static void note_window_unload(Window *window) {
 }
 
 void note_init()
-{
-	GRect windowBounds = GRect(0, 0, 144, 168 - 16);
-
+{ 
+  
+  
 	fullWindow = window_create();
 	Layer* topLayer = window_get_root_layer(fullWindow);
+  GRect windowBounds = layer_get_bounds(topLayer);
+  
   window_set_window_handlers(fullWindow, (WindowHandlers) { //Add handlers
     .load = note_window_load,
     .unload = note_window_unload
