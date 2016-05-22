@@ -66,6 +66,7 @@ void note_init() {
 	text_layer_set_font(fullNoteText, fonts_get_system_font(FONT_KEY_GOTHIC_18));
 
 	scroller = scroll_layer_create(windowBounds);
+  scroll_layer_set_shadow_hidden(scroller, true);
 	scroll_layer_set_click_config_onto_window(scroller, fullWindow);
 	scroll_layer_add_child(scroller, (Layer *) fullNoteText);
 

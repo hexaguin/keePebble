@@ -107,7 +107,7 @@ static int16_t get_cell_height_callback(struct MenuLayer *menu_layer, MenuIndex 
   return PBL_IF_ROUND_ELSE(
     menu_layer_is_index_selected(menu_layer, cell_index) ?
       MENU_CELL_ROUND_FOCUSED_SHORT_CELL_HEIGHT : MENU_CELL_ROUND_UNFOCUSED_TALL_CELL_HEIGHT,
-    44); //TODO figure out what the 44 does
+    44);
 }
 
 static void select_callback(struct MenuLayer *menu_layer, MenuIndex *cell_index, void *context) {
