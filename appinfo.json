@@ -1,5 +1,7 @@
 {
-    "appKeys": {},
+    "appKeys": {
+        "timelineToken": 8
+    },
     "capabilities": [
         ""
     ],
