@@ -42,7 +42,7 @@ void sendSelection(){
 void received_data(DictionaryIterator *received, void *context) { //Inbound packets
 	uint8_t module = dict_find(received, 0)->value->uint8;
   uint8_t id = dict_find(received, 1)->value->uint8;
-  
+
   switch(module) {
     case 0: //System module
       switch(id) {
@@ -55,7 +55,7 @@ void received_data(DictionaryIterator *received, void *context) { //Inbound pack
             APP_LOG(APP_LOG_LEVEL_ERROR, "Handshake failed, watch is running version %u, phone is running %u", PROTOCOL_VERSION, dict_find(received, 2)->value->uint16);
           }
           break; //end of protocol version
-        
+
         case 1: //Error packet
           switch(dict_find(received, 2)->value->uint16){
             case 0: //Protocol mismatch
@@ -66,16 +66,16 @@ void received_data(DictionaryIterator *received, void *context) { //Inbound pack
               APP_LOG(APP_LOG_LEVEL_ERROR, "Unknown error packet: %u", dict_find(received, 2)->value->uint16); //print the unknown error code
           }
           break; //End of error packet
-          
+
         default: //unkown system packet
           APP_LOG(APP_LOG_LEVEL_WARNING, "Unknown system packet id: %u", id);
       }
       break;
-    
+
     default: //unknown module #
       APP_LOG(APP_LOG_LEVEL_DEBUG, "Unknown module: %u", module);
   }
-    
+
 }
 
 uint16_t get_num_rows_callback(MenuLayer *me, uint16_t section_index, void *data) {
@@ -101,29 +101,29 @@ static void select_callback(struct MenuLayer *menu_layer, MenuIndex *cell_index,
 }
 
 static void main_window_load(Window *window) {
-  
+
   Layer *window_layer = window_get_root_layer(window);
   s_statusbar_layer = status_bar_layer_create();
   status_bar_layer_set_colors(s_statusbar_layer, COLOR_HIGHLIGHT, COLOR_FOREGROUND);
   status_bar_layer_set_separator_mode(s_statusbar_layer, StatusBarLayerSeparatorModeDotted);
-  
+
   GRect bounds = layer_get_bounds(window_layer);
   bounds.origin.y+=STATUS_BAR_LAYER_HEIGHT; //resize "usable" area to not overlap with statusbar
   bounds.size.h-=STATUS_BAR_LAYER_HEIGHT;
-  
+
   GRect loadingBounds = GRect(0, 84, 144, 84 - 16);
   s_loading_layer = text_layer_create(loadingBounds);
 	text_layer_set_font(s_loading_layer, fonts_get_system_font(FONT_KEY_GOTHIC_24));
 	text_layer_set_text(s_loading_layer, "Loading...");
   text_layer_set_text_alignment(s_loading_layer, GTextAlignmentCenter);
-  
+
   s_menu_layer = menu_layer_create(bounds);
   menu_layer_set_click_config_onto_window(s_menu_layer, window);
 #if defined(PBL_COLOR)
   menu_layer_set_normal_colors(s_menu_layer, COLOR_BACKGROUND, COLOR_FOREGROUND);
   menu_layer_set_highlight_colors(s_menu_layer, COLOR_HIGHLIGHT, COLOR_FOREGROUND);
 #endif
-  
+
   layer_add_child(window_layer, (Layer*) s_loading_layer);
   menu_layer_set_callbacks(s_menu_layer, NULL, (MenuLayerCallbacks) {
       .get_num_rows = get_num_rows_callback,
@@ -133,31 +133,30 @@ static void main_window_load(Window *window) {
   });
   layer_add_child(window_layer, menu_layer_get_layer(s_menu_layer));
   layer_add_child(window_layer, status_bar_layer_get_layer(s_statusbar_layer));
-  
+
   layer_set_hidden((Layer*) s_loading_layer, false);
 	layer_set_hidden((Layer*) s_menu_layer, true);
 }
 
 static void main_window_unload(Window *window) {
-  
+
 }
 
 static void init() {
   app_message_register_inbox_received(received_data);
 	app_message_open(256, 64);
-  
+
   s_main_window = window_create(); //Make the main window
   window_set_window_handlers(s_main_window, (WindowHandlers) { //Add handlers
     .load = main_window_load,
     .unload = main_window_unload
   });
-  
+
   window_stack_push(s_main_window, true);
-  
+
   APP_LOG(APP_LOG_LEVEL_DEBUG, "Windows made, sending protocol version");
-  
-  psleep(500); //HACK REMOVE THIS
-  
+
+  //psleep(500); //Use if you want to view the init packet with the JS debug
   app_comm_set_sniff_interval(SNIFF_INTERVAL_REDUCED); //Do phone handshake
 	DictionaryIterator *iterator;
 	app_message_outbox_begin(&iterator);
