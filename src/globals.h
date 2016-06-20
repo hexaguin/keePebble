@@ -8,3 +8,5 @@ extern bool displayingNote;
 #define COLOR_HIGHLIGHT GColorOrange
 
 #define NOTE_PADDING 8
+
+#define PROTOCOL_VERSION 0

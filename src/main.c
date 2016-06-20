@@ -17,6 +17,15 @@ int8_t pickedItem = -1;
 
 extern bool displayingNote;
 
+enum HandshakeStatus{
+  no_handshake, //No handshaking has happened yet
+  waiting_for_version, //Waiting for the phone to respond with a system packet
+  handshake_complete, //Succesfully did handshake, everything is ready to go
+  handshake_error //Handshake failed, most likely due to mismatched versions
+};
+
+enum HandshakeStatus currentStatus = no_handshake;
+
 void sendSelection(){
 	DictionaryIterator *iterator;
 	app_message_outbox_begin(&iterator);
@@ -30,69 +39,43 @@ void sendSelection(){
 	app_comm_set_sniff_interval(SNIFF_INTERVAL_NORMAL);
 }
 
-void list_part_received(DictionaryIterator *received){ //TODO figure out how this whole blob of code works
-	uint8_t index = dict_find(received, 1)->value->uint8;
-	numOfItems = dict_find(received, 2)->value->uint8;
-
-	bool listFinished = false;
-
-	for (uint8_t i = 0; i < 3; i++) {
-		uint8_t listPos = index + i;
-    
-		if (listPos > numOfItems - 1) {
-			listFinished = true;
-			break;
-		}
-		strcpy(items[listPos], dict_find(received, i + 3)->value->cstring);
-	}
-
-	if (index + 3 == numOfItems) listFinished = true;
-
-	if (listFinished)	{
-		loading = false;
-	}
-	else {
-		if (pickedItem != -1)	{
-			sendSelection();
-			return;
-		}
-
-		DictionaryIterator *iterator;
-		app_message_outbox_begin(&iterator);
-
-		dict_write_uint8(iterator, 0, 1);
-		dict_write_uint8(iterator, 1, index + 3);
-
-		app_message_outbox_send();
-
-		app_comm_set_sniff_interval(SNIFF_INTERVAL_REDUCED);
-		app_comm_set_sniff_interval(SNIFF_INTERVAL_NORMAL);
-	}
+void received_data(DictionaryIterator *received, void *context) { //Inbound packets
+	uint8_t module = dict_find(received, 0)->value->uint8;
+  uint8_t id = dict_find(received, 1)->value->uint8;
   
-	layer_set_hidden((Layer*) s_loading_layer, true);
-	layer_set_hidden((Layer*) s_menu_layer, false);
-
-	menu_layer_reload_data(s_menu_layer);
-}
-
-void received_data(DictionaryIterator *received, void *context) {
-	if (displayingNote)	{
-		note_data_received(received);
-		return;
-	}
-
-	uint8_t id = dict_find(received, 0)->value->uint8;
-
-	switch (id)	{
-  	case 0:
-  		list_part_received(received);
-  		break;
-  	case 1:
-  		displayingNote = true;
-  		note_init();
-  		note_data_received(received);
-  		break;
-	}
+  switch(module) {
+    case 0: //System module
+      switch(id) {
+        case 0: //Protocol version
+          if( (dict_find(received, 2)->value->uint16) == PROTOCOL_VERSION ){ //if recieved version matches the current used version
+            currentStatus = handshake_complete;
+            APP_LOG(APP_LOG_LEVEL_DEBUG, "Handshake complete, using protocol version %u", PROTOCOL_VERSION);
+          } else {
+            currentStatus = handshake_error; //TODO error screen
+            APP_LOG(APP_LOG_LEVEL_ERROR, "Handshake failed, watch is running version %u, phone is running %u", PROTOCOL_VERSION, dict_find(received, 2)->value->uint16);
+          }
+          break; //end of protocol version
+        
+        case 1: //Error packet
+          switch(dict_find(received, 2)->value->uint16){
+            case 0: //Protocol mismatch
+              APP_LOG(APP_LOG_LEVEL_ERROR, "Protocol missmatch detected by phone");
+              currentStatus = handshake_error;
+              break; //End of mismatch
+            default:
+              APP_LOG(APP_LOG_LEVEL_ERROR, "Unknown error packet: %u", dict_find(received, 2)->value->uint16); //print the unknown error code
+          }
+          break; //End of error packet
+          
+        default: //unkown system packet
+          APP_LOG(APP_LOG_LEVEL_WARNING, "Unknown system packet id: %u", id);
+      }
+      break;
+    
+    default: //unknown module #
+      APP_LOG(APP_LOG_LEVEL_DEBUG, "Unknown module: %u", module);
+  }
+    
 }
 
 uint16_t get_num_rows_callback(MenuLayer *me, uint16_t section_index, void *data) {
@@ -161,7 +144,7 @@ static void main_window_unload(Window *window) {
 
 static void init() {
   app_message_register_inbox_received(received_data);
-	app_message_open(120, 20);
+	app_message_open(256, 64);
   
   s_main_window = window_create(); //Make the main window
   window_set_window_handlers(s_main_window, (WindowHandlers) { //Add handlers
@@ -171,11 +154,18 @@ static void init() {
   
   window_stack_push(s_main_window, true);
   
-  app_comm_set_sniff_interval(SNIFF_INTERVAL_REDUCED); //Do phone magic
+  APP_LOG(APP_LOG_LEVEL_DEBUG, "Windows made, sending protocol version");
+  
+  psleep(500); //HACK REMOVE THIS
+  
+  app_comm_set_sniff_interval(SNIFF_INTERVAL_REDUCED); //Do phone handshake
 	DictionaryIterator *iterator;
 	app_message_outbox_begin(&iterator);
-	dict_write_uint8(iterator, 0, 0);
+	dict_write_uint8(iterator, 0, 0); //Set module id to 0 (system)
+  dict_write_uint8(iterator, 1, 0); //Set packet id to 0 (version)
+  dict_write_uint16(iterator, 2, PROTOCOL_VERSION); //Set packet contents to protocol version
 	app_message_outbox_send();
+  APP_LOG(APP_LOG_LEVEL_DEBUG, "Sent protocol version: %u", PROTOCOL_VERSION);
 }
 
 static void deinit() {
