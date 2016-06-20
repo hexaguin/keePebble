@@ -9,4 +9,4 @@ extern bool displayingNote;
 
 #define NOTE_PADDING 8
 
-#define PROTOCOL_VERSION 0
+#define PROTOCOL_VERSION 1

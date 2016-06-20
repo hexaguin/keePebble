@@ -55,7 +55,14 @@ void sendSelection(){ //TODO replace with new request type
 	app_comm_set_sniff_interval(SNIFF_INTERVAL_NORMAL);
 }
 
+void print_packet(DictionaryIterator *received){//debug function to print packet contents
+  APP_LOG(APP_LOG_LEVEL_DEBUG, "Watch Recieved Packet");
+  APP_LOG(APP_LOG_LEVEL_DEBUG, "Module: %u", dict_find(received, 0)->value->uint8);
+  APP_LOG(APP_LOG_LEVEL_DEBUG, "ID: %u", dict_find(received, 1)->value->uint8);
+}
+
 void received_data(DictionaryIterator *received, void *context) { //Inbound packets
+  print_packet(received);
 	uint8_t module = dict_find(received, 0)->value->uint8;
   uint8_t id = dict_find(received, 1)->value->uint8;
 
