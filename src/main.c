@@ -1,5 +1,6 @@
 #include <pebble.h>
 #include "notes.h"
+#include "popup.h"
 #include "globals.h"
 
 /*
@@ -87,6 +88,7 @@ void received_data(DictionaryIterator *received, void *context) { //Inbound pack
               break; //End of mismatch
             default:
               APP_LOG(APP_LOG_LEVEL_ERROR, "Unknown error packet: %u", dict_find(received, 2)->value->uint16); //print the unknown error code
+              popup_window_push();
           }
           break; //End of error packet
 
