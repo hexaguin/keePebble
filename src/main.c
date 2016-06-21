@@ -88,7 +88,7 @@ void received_data(DictionaryIterator *received, void *context) { //Inbound pack
               break; //End of mismatch
             default:
               APP_LOG(APP_LOG_LEVEL_ERROR, "Unknown error packet: %u", dict_find(received, 2)->value->uint16); //print the unknown error code
-              popup_window_push();
+              popup_window_push("Unknown error packet recieved. Please update both apps.");
           }
           break; //End of error packet
 

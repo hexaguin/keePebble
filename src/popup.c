@@ -9,6 +9,8 @@ static TextLayer *s_label_layer;
 static Layer *s_background_layer, *s_icon_layer;
 static GBitmap *s_icon_bitmap;
 
+char *popup_message = "Even the error message broke."; //Gets replaced when the window is made
+
 static void icon_update_proc(Layer *layer, GContext *ctx) {
   GRect bounds = layer_get_bounds(layer);
   GRect bitmap_bounds = gbitmap_get_bounds(s_icon_bitmap);
@@ -49,7 +51,7 @@ static void window_load(Window *window) {
       bounds.size.w - (2 * POPUP_WINDOW_MARGIN),
       bounds.size.h
       ));
-  text_layer_set_text(s_label_layer, "ERROR");
+  text_layer_set_text(s_label_layer, popup_message);
   text_layer_set_background_color(s_label_layer, GColorClear);
   text_layer_set_text_alignment(s_label_layer, PBL_IF_ROUND_ELSE(GTextAlignmentCenter, GTextAlignmentLeft));
   text_layer_set_font(s_label_layer, fonts_get_system_font(FONT_KEY_GOTHIC_24_BOLD));
@@ -68,7 +70,8 @@ static void window_unload(Window *window) {
   s_main_window = NULL;
 }
 
-void popup_window_push() {
+void popup_window_push(char *message) {//TODO add different types (e.g. error, info, confirmation, ect.)
+  popup_message = message;
   if(!s_main_window) {
     s_main_window = window_create();
     window_set_background_color(s_main_window, GColorBlack);
