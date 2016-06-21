@@ -68,37 +68,48 @@ void received_data(DictionaryIterator *received, void *context) { //Inbound pack
   uint8_t id = dict_find(received, 1)->value->uint8;
 
   switch(module) {
-    case 0: //System module
-      switch(id) {
-        case 0: //Protocol version
-          if( (dict_find(received, 2)->value->uint16) == PROTOCOL_VERSION ){ //if recieved version matches the current used version
-            currentStatus = handshake_complete;
-            APP_LOG(APP_LOG_LEVEL_DEBUG, "Handshake complete, using protocol version %u", PROTOCOL_VERSION);
-          } else {
-            currentStatus = handshake_error; //TODO error screen
-            APP_LOG(APP_LOG_LEVEL_ERROR, "Handshake failed, watch is running version %u, phone is running %u", PROTOCOL_VERSION, dict_find(received, 2)->value->uint16);
-          }
-          break; //end of protocol version
+	 case 0: //System module
+		switch(id) {
+		  case 0: //Protocol version
+			 if( (dict_find(received, 2)->value->uint16) == PROTOCOL_VERSION ){ //if recieved version matches the current used version
+				currentStatus = handshake_complete;
+				APP_LOG(APP_LOG_LEVEL_DEBUG, "Handshake complete, using protocol version %u", PROTOCOL_VERSION);
+			 } else {
+				currentStatus = handshake_error; //TODO error screen
+				APP_LOG(APP_LOG_LEVEL_ERROR, "Handshake failed, watch is running version %u, phone is running %u", PROTOCOL_VERSION, dict_find(received, 2)->value->uint16);
+			 }
+			 break; //end of protocol version
 
-        case 1: //Error packet
-          switch(dict_find(received, 2)->value->uint16){
-            case 0: //Protocol mismatch
-              APP_LOG(APP_LOG_LEVEL_ERROR, "Protocol missmatch detected by phone");
-              currentStatus = handshake_error;
-              break; //End of mismatch
-            default:
-              APP_LOG(APP_LOG_LEVEL_ERROR, "Unknown error packet: %u", dict_find(received, 2)->value->uint16); //print the unknown error code
-              popup_window_push("Unknown error packet recieved. Please update both apps.");
-          }
-          break; //End of error packet
+		  case 1: //Error packet
+			 switch(dict_find(received, 2)->value->uint16){
+				case 0: //Phone out of date
+				  APP_LOG(APP_LOG_LEVEL_ERROR, "Protocol missmatch detected by phone");
+				  currentStatus = handshake_error;
+				  popup_window_push("Please update the phone app");
+				  break; //End of phone OOD
+				case 1: //Watch out of date
+					APP_LOG(APP_LOG_LEVEL_ERROR, "Protocol missmatch detected by phone");
+					currentStatus = handshake_error;
+				  	popup_window_push("Please update the watchapp");
+					break; //End of watch OOD
+				case 2: //Unable to open Keep DB
+					APP_LOG(APP_LOG_LEVEL_ERROR, "Phone unable to open Keep DB");
+					currentStatus = handshake_error;
+				  	popup_window_push("Unable to open Keep DB. Are you rooted?");
+					break; //End of keep error
+				default:
+				  APP_LOG(APP_LOG_LEVEL_ERROR, "Unknown error packet: %u", dict_find(received, 2)->value->uint16); //print the unknown error code
+				  popup_window_push("Unknown error packet recieved. Please update both apps.");
+			 }
+			 break; //End of error packet
 
-        default: //unkown system packet
-          APP_LOG(APP_LOG_LEVEL_WARNING, "Unknown system packet id: %u", id);
-      }
-      break;
+		  default: //unkown system packet
+			 APP_LOG(APP_LOG_LEVEL_WARNING, "Unknown system packet id: %u", id);
+		}
+		break;
 
-    default: //unknown module #
-      APP_LOG(APP_LOG_LEVEL_DEBUG, "Unknown module: %u", module);
+	 default: //unknown module #
+		APP_LOG(APP_LOG_LEVEL_DEBUG, "Unknown module: %u", module);
   }
 
 }
@@ -121,9 +132,9 @@ static void draw_row_callback(GContext *ctx, const Layer *cell_layer, MenuIndex 
 
 static int16_t get_cell_height_callback(struct MenuLayer *menu_layer, MenuIndex *cell_index, void *context) {
   return PBL_IF_ROUND_ELSE(
-    menu_layer_is_index_selected(menu_layer, cell_index) ?
-      MENU_CELL_ROUND_FOCUSED_SHORT_CELL_HEIGHT : MENU_CELL_ROUND_UNFOCUSED_TALL_CELL_HEIGHT,
-    44);
+	 menu_layer_is_index_selected(menu_layer, cell_index) ?
+		MENU_CELL_ROUND_FOCUSED_SHORT_CELL_HEIGHT : MENU_CELL_ROUND_UNFOCUSED_TALL_CELL_HEIGHT,
+	 44);
 }
 
 static void select_callback(struct MenuLayer *menu_layer, MenuIndex *cell_index, void *context) {
@@ -166,10 +177,10 @@ static void main_window_load(Window *window) {
 
   layer_add_child(window_layer, (Layer*) s_loading_layer);
   menu_layer_set_callbacks(s_menu_layer, NULL, (MenuLayerCallbacks) {
-      .get_num_rows = get_num_rows_callback,
-      .draw_row = draw_row_callback,
-      .get_cell_height = get_cell_height_callback,
-      .select_click = select_callback,
+		.get_num_rows = get_num_rows_callback,
+		.draw_row = draw_row_callback,
+		.get_cell_height = get_cell_height_callback,
+		.select_click = select_callback,
   });
   layer_add_child(window_layer, menu_layer_get_layer(s_menu_layer));
   layer_add_child(window_layer, status_bar_layer_get_layer(s_statusbar_layer));
@@ -188,8 +199,8 @@ static void init() {
 
   s_main_window = window_create(); //Make the main window
   window_set_window_handlers(s_main_window, (WindowHandlers) { //Add handlers
-    .load = main_window_load,
-    .unload = main_window_unload
+	 .load = main_window_load,
+	 .unload = main_window_unload
   });
 
   window_stack_push(s_main_window, true);
