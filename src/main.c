@@ -95,7 +95,7 @@ switch(module) {
 					case 2: //Unable to open Keep DB
 						APP_LOG(APP_LOG_LEVEL_ERROR, "Phone unable to open Keep DB");
 						currentStatus = handshake_error;
-						popup_window_push("Unable to open Keep DB. Are you rooted?");
+						popup_window_push("Unable to open Keep database. Are you rooted?");
 						break; //End of keep error
 					default:
 						APP_LOG(APP_LOG_LEVEL_ERROR, "Unknown error packet: %u", dict_find(received, 2)->value->uint16); //print the unknown error code
