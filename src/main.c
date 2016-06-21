@@ -85,17 +85,17 @@ void received_data(DictionaryIterator *received, void *context) { //Inbound pack
 				case 0: //Phone out of date
 				  APP_LOG(APP_LOG_LEVEL_ERROR, "Protocol missmatch detected by phone");
 				  currentStatus = handshake_error;
-				  popup_window_push("Please update the phone app");
+				  popup_window_push("Please update the KeePebble phone app.");
 				  break; //End of phone OOD
 				case 1: //Watch out of date
 					APP_LOG(APP_LOG_LEVEL_ERROR, "Protocol missmatch detected by phone");
 					currentStatus = handshake_error;
-				  	popup_window_push("Please update the watchapp");
+				  	popup_window_push("Please update this watchapp.");
 					break; //End of watch OOD
 				case 2: //Unable to open Keep DB
 					APP_LOG(APP_LOG_LEVEL_ERROR, "Phone unable to open Keep DB");
 					currentStatus = handshake_error;
-				  	popup_window_push("Unable to open Keep DB. Are you rooted?");
+				  	popup_window_push("Unable to open Keep database. Are you rooted?");
 					break; //End of keep error
 				default:
 				  APP_LOG(APP_LOG_LEVEL_ERROR, "Unknown error packet: %u", dict_find(received, 2)->value->uint16); //print the unknown error code
