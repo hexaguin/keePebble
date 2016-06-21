@@ -77,6 +77,7 @@ switch(module) {
 			} else {
 				currentStatus = handshake_error; //TODO error screen
 				APP_LOG(APP_LOG_LEVEL_ERROR, "Handshake failed, watch is running version %u, phone is running %u", PROTOCOL_VERSION, dict_find(received, 2)->value->uint16);
+<<<<<<< HEAD
 			}
 			break; //end of protocol version
 
@@ -105,6 +106,36 @@ switch(module) {
 
 			default: //unkown system packet
 			APP_LOG(APP_LOG_LEVEL_WARNING, "Unknown system packet id: %u", id);
+=======
+			 }
+			 break; //end of protocol version
+
+		  case 1: //Error packet
+			 switch(dict_find(received, 2)->value->uint16){
+				case 0: //Phone out of date
+				  APP_LOG(APP_LOG_LEVEL_ERROR, "Protocol missmatch detected by phone");
+				  currentStatus = handshake_error;
+				  popup_window_push("Please update the KeePebble phone app.");
+				  break; //End of phone OOD
+				case 1: //Watch out of date
+					APP_LOG(APP_LOG_LEVEL_ERROR, "Protocol missmatch detected by phone");
+					currentStatus = handshake_error;
+				  	popup_window_push("Please update this watchapp.");
+					break; //End of watch OOD
+				case 2: //Unable to open Keep DB
+					APP_LOG(APP_LOG_LEVEL_ERROR, "Phone unable to open Keep DB");
+					currentStatus = handshake_error;
+				  	popup_window_push("Unable to open Keep database. Are you rooted?");
+					break; //End of keep error
+				default:
+				  APP_LOG(APP_LOG_LEVEL_ERROR, "Unknown error packet: %u", dict_find(received, 2)->value->uint16); //print the unknown error code
+				  popup_window_push("Unknown error packet recieved. Please update both apps.");
+			 }
+			 break; //End of error packet
+
+		  default: //unkown system packet
+			 APP_LOG(APP_LOG_LEVEL_WARNING, "Unknown system packet id: %u", id);
+>>>>>>> origin/NewProtocol
 		}
 		break;
 
